@@ -17,7 +17,7 @@ class EmpruntView:
 
     def create_widgets(self):
         """Crée les widgets pour l'interface des emprunts."""
-        self.root.title("Gestion des Emprunts")
+        ##self.root.title("Gestion des Emprunts")
 
         # ID Livre
         self.label_id_livre = tk.Label(self.root, text="ID Livre")

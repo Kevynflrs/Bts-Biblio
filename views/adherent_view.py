@@ -17,7 +17,7 @@ class AdherentView:
 
     def create_widgets(self):
         """Crée les widgets pour l'interface des adhérents."""
-        self.root.title("Gestion des Adhérents")
+        ##self.root.title("Gestion des Adhérents")
 
         # Nom
         self.label_nom = tk.Label(self.root, text="Nom")
