@@ -47,6 +47,20 @@ class LivreView:
         self.button_lister = tk.Button(self.root, text="Lister", command=self.refresh_livre_list)
         self.button_lister.grid(row=3, column=2)
 
+        # Champ pour l'ID du livre à modifier/supprimer
+        self.label_id = tk.Label(self.root, text="ID du livre")
+        self.label_id.grid(row=5, column=0)
+        self.entry_id = tk.Entry(self.root)
+        self.entry_id.grid(row=5, column=1)
+
+        # Bouton Modifier
+        self.button_modifier = tk.Button(self.root, text="Modifier", command=self.modifier_livre)
+        self.button_modifier.grid(row=5, column=2)
+
+        # Bouton Supprimer
+        self.button_supprimer = tk.Button(self.root, text="Supprimer", command=self.supprimer_livre)
+        self.button_supprimer.grid(row=5, column=3)
+
         # Zone de texte pour afficher les résultats
         self.text_results = tk.Text(self.root, height=10, width=50)
         self.text_results.grid(row=4, column=0, columnspan=3)
@@ -90,6 +104,46 @@ class LivreView:
 
         self.livre_controller.add_livre(titre, auteur, annee)
         messagebox.showinfo("Succès", "Livre ajouté avec succès.")
+        self.refresh_livre_list()
+
+    def modifier_livre(self):
+        """Modifie un livre existant dans la base de données."""
+        id_livre = self.entry_id.get()
+        titre = self.entry_titre.get()
+        auteur = self.entry_auteur.get()
+        annee = self.entry_annee.get()
+
+        if not id_livre or not titre or not auteur or not annee:
+            messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
+            return
+
+        try:
+            id_livre = int(id_livre)
+            annee = int(annee)
+        except ValueError:
+            messagebox.showerror("Erreur", "L'ID et l'année doivent être des nombres.")
+            return
+
+        if not self.validate_input(titre, auteur, annee):
+            return
+
+        self.livre_controller.update_livre(id_livre, titre, auteur, annee)
+        messagebox.showinfo("Succès", "Livre modifié avec succès.")
+        self.refresh_livre_list()
+
+    def supprimer_livre(self):
+        """Supprime un livre de la base de données par son ID."""
+        id_livre = self.entry_id.get()
+        if not id_livre:
+            messagebox.showerror("Erreur", "Veuillez saisir l'ID du livre à supprimer.")
+            return
+        try:
+            id_livre = int(id_livre)
+        except ValueError:
+            messagebox.showerror("Erreur", "L'ID doit être un nombre.")
+            return
+        self.livre_controller.delete_livre(id_livre)
+        messagebox.showinfo("Succès", "Livre supprimé avec succès.")
         self.refresh_livre_list()
 
     def rechercher_livre(self):
