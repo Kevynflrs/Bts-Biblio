@@ -4,16 +4,18 @@ from controllers.adherent_controller import AdherentController
 import re
 
 class AdherentView:
-    def __init__(self, root, db_file):
+    def __init__(self, root, db_file, role):
         """
         Initialise la vue des adhérents.
 
         Arguments :
         root : La fenêtre principale de l'application.
         db_file (str) : Le chemin vers le fichier de la base de données.
+        role (str) : Le rôle de l'utilisateur (admin ou agent).
         """
         self.root = root
         self.adherent_controller = AdherentController(db_file)
+        self.role = role
         self.create_widgets()
         self.refresh_adherent_list()
 
@@ -47,13 +49,16 @@ class AdherentView:
         self.button_lister = tk.Button(self.root, text="Lister", command=self.refresh_adherent_list)
         self.button_lister.grid(row=3, column=2)
 
+        # Désactiver les boutons pour les agents
+        if self.role != "admin":
+            self.button_ajouter.config(state=tk.DISABLED)
+
         # Zone de texte pour afficher les résultats
         self.text_results = tk.Text(self.root, height=10, width=50)
         self.text_results.grid(row=4, column=0, columnspan=3)
 
     def validate_input(self, nom, prenom, email):
         """Valide les entrées utilisateur avec des expressions régulières."""
-        # Vérifie que le nom et le prénom ne contiennent que des lettres, des espaces et certains caractères spéciaux
         if not re.match(r'^[a-zA-Z\s\-éèêëàâäçîïôöùûüÿœæÉÈÊËÀÂÄÇÎÏÔÖÙÛÜŸŒÆ]+$', nom):
             messagebox.showerror("Erreur", "Le nom contient des caractères invalides.")
             return False
@@ -62,7 +67,6 @@ class AdherentView:
             messagebox.showerror("Erreur", "Le prénom contient des caractères invalides.")
             return False
 
-        # Vérifie que l'email est valide
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
             messagebox.showerror("Erreur", "L'email est invalide.")
             return False

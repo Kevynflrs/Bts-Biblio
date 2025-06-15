@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 from views.auth_view import AuthView
 from views.livre_view import LivreView
 from views.adherent_view import AdherentView
@@ -38,22 +38,17 @@ class Application(tk.Frame):
         # Onglet pour la gestion des livres
         livre_frame = ttk.Frame(self.notebook)
         self.notebook.add(livre_frame, text="Gestion des Livres")
-        LivreView(livre_frame, self.db_file)
+        LivreView(livre_frame, self.db_file, self.role)
 
         # Onglet pour la gestion des adhérents
         adherent_frame = ttk.Frame(self.notebook)
         self.notebook.add(adherent_frame, text="Gestion des Adhérents")
-        AdherentView(adherent_frame, self.db_file)
+        AdherentView(adherent_frame, self.db_file, self.role)
 
         # Onglet pour la gestion des emprunts
         emprunt_frame = ttk.Frame(self.notebook)
         self.notebook.add(emprunt_frame, text="Gestion des Emprunts")
-        EmpruntView(emprunt_frame, self.db_file)
-
-        # Désactiver les onglets en fonction du rôle
-        if self.role != "admin":
-            self.notebook.tab(1, state="disabled")  # Désactiver l'onglet Adhérents
-            self.notebook.tab(2, state="disabled")  # Désactiver l'onglet Emprunts
+        EmpruntView(emprunt_frame, self.db_file, self.role)
 
 def main():
     root = tk.Tk()

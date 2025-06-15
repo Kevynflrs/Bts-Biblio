@@ -4,16 +4,18 @@ from controllers.emprunt_controller import EmpruntController
 import re
 
 class EmpruntView:
-    def __init__(self, root, db_file):
+    def __init__(self, root, db_file, role):
         """
         Initialise la vue des emprunts.
 
         Arguments :
         root : La fenêtre principale de l'application.
         db_file (str) : Le chemin vers le fichier de la base de données.
+        role (str) : Le rôle de l'utilisateur (admin ou agent).
         """
         self.root = root
         self.emprunt_controller = EmpruntController(db_file)
+        self.role = role
         self.create_widgets()
         self.refresh_emprunt_list()
 
@@ -45,19 +47,6 @@ class EmpruntView:
         self.text_results = tk.Text(self.root, height=10, width=50)
         self.text_results.grid(row=3, column=0, columnspan=3)
 
-    def validate_input(self, id_livre, id_adherent):
-        """Valide les entrées utilisateur avec des expressions régulières."""
-        # Vérifie que les IDs sont des nombres valides
-        if not re.match(r'^\d+$', id_livre):
-            messagebox.showerror("Erreur", "L'ID du livre doit être un nombre.")
-            return False
-
-        if not re.match(r'^\d+$', id_adherent):
-            messagebox.showerror("Erreur", "L'ID de l'adhérent doit être un nombre.")
-            return False
-
-        return True
-
     def emprunter_livre(self):
         """Enregistre un nouvel emprunt dans la base de données."""
         id_livre = self.entry_id_livre.get()
@@ -67,7 +56,12 @@ class EmpruntView:
             messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
             return
 
-        if not self.validate_input(id_livre, id_adherent):
+        if not re.match(r'^\d+$', id_livre):
+            messagebox.showerror("Erreur", "L'ID du livre doit être un nombre.")
+            return
+
+        if not re.match(r'^\d+$', id_adherent):
+            messagebox.showerror("Erreur", "L'ID de l'adhérent doit être un nombre.")
             return
 
         self.emprunt_controller.emprunter_livre(int(id_livre), int(id_adherent))

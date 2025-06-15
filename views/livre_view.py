@@ -1,19 +1,21 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 from controllers.livre_controller import LivreController
 import re
 
 class LivreView:
-    def __init__(self, root, db_file):
+    def __init__(self, root, db_file, role):
         """
         Initialise la vue des livres.
 
         Arguments :
         root : La fenêtre principale de l'application.
         db_file (str) : Le chemin vers le fichier de la base de données.
+        role (str) : Le rôle de l'utilisateur (admin ou agent).
         """
         self.root = root
         self.livre_controller = LivreController(db_file)
+        self.role = role
         self.create_widgets()
         self.refresh_livre_list()
 
@@ -41,33 +43,26 @@ class LivreView:
         self.button_ajouter = tk.Button(self.root, text="Ajouter", command=self.ajouter_livre)
         self.button_ajouter.grid(row=3, column=0)
 
+        self.button_modifier = tk.Button(self.root, text="Modifier", command=self.open_modify_dialog)
+        self.button_modifier.grid(row=3, column=1)
+
         self.button_rechercher = tk.Button(self.root, text="Rechercher", command=self.rechercher_livre)
-        self.button_rechercher.grid(row=3, column=1)
+        self.button_rechercher.grid(row=4, column=0)
 
         self.button_lister = tk.Button(self.root, text="Lister", command=self.refresh_livre_list)
-        self.button_lister.grid(row=3, column=2)
+        self.button_lister.grid(row=4, column=1)
 
-        # Champ pour l'ID du livre à modifier/supprimer
-        self.label_id = tk.Label(self.root, text="ID du livre")
-        self.label_id.grid(row=5, column=0)
-        self.entry_id = tk.Entry(self.root)
-        self.entry_id.grid(row=5, column=1)
-
-        # Bouton Modifier
-        self.button_modifier = tk.Button(self.root, text="Modifier", command=self.modifier_livre)
-        self.button_modifier.grid(row=5, column=2)
-
-        # Bouton Supprimer
-        self.button_supprimer = tk.Button(self.root, text="Supprimer", command=self.supprimer_livre)
-        self.button_supprimer.grid(row=5, column=3)
+        # Désactiver les boutons pour les agents
+        if self.role != "admin":
+            self.button_ajouter.config(state=tk.DISABLED)
+            self.button_modifier.config(state=tk.DISABLED)
 
         # Zone de texte pour afficher les résultats
         self.text_results = tk.Text(self.root, height=10, width=50)
-        self.text_results.grid(row=4, column=0, columnspan=3)
+        self.text_results.grid(row=5, column=0, columnspan=3)
 
     def validate_input(self, titre, auteur, annee):
         """Valide les entrées utilisateur avec des expressions régulières."""
-        # Vérifie que le titre et l'auteur ne contiennent que des lettres, des chiffres et des espaces
         if not re.match(r'^[a-zA-Z0-9\s\-éèêëàâäçîïôöùûüÿœæÉÈÊËÀÂÄÇÎÏÔÖÙÛÜŸŒÆ]+$', titre):
             messagebox.showerror("Erreur", "Le titre contient des caractères invalides.")
             return False
@@ -76,7 +71,6 @@ class LivreView:
             messagebox.showerror("Erreur", "L'auteur contient des caractères invalides.")
             return False
 
-        # Vérifie que l'année est un nombre valide
         if not re.match(r'^\d{4}$', str(annee)):
             messagebox.showerror("Erreur", "L'année doit être un nombre à 4 chiffres.")
             return False
@@ -106,45 +100,54 @@ class LivreView:
         messagebox.showinfo("Succès", "Livre ajouté avec succès.")
         self.refresh_livre_list()
 
-    def modifier_livre(self):
-        """Modifie un livre existant dans la base de données."""
-        id_livre = self.entry_id.get()
-        titre = self.entry_titre.get()
-        auteur = self.entry_auteur.get()
-        annee = self.entry_annee.get()
+    def open_modify_dialog(self):
+        """Ouvre une boîte de dialogue pour modifier un livre."""
+        selected_livre_id = simpledialog.askinteger("Modifier Livre", "Entrez l'ID du livre à modifier:")
+        if selected_livre_id:
+            self.show_modify_dialog(selected_livre_id)
 
-        if not id_livre or not titre or not auteur or not annee:
-            messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
-            return
+    def show_modify_dialog(self, livre_id):
+        """Affiche une boîte de dialogue pour modifier un livre."""
+        modify_window = tk.Toplevel(self.root)
+        modify_window.title("Modifier Livre")
 
-        try:
-            id_livre = int(id_livre)
-            annee = int(annee)
-        except ValueError:
-            messagebox.showerror("Erreur", "L'ID et l'année doivent être des nombres.")
-            return
+        tk.Label(modify_window, text="Titre:").grid(row=0, column=0)
+        entry_titre = tk.Entry(modify_window)
+        entry_titre.grid(row=0, column=1)
 
-        if not self.validate_input(titre, auteur, annee):
-            return
+        tk.Label(modify_window, text="Auteur:").grid(row=1, column=0)
+        entry_auteur = tk.Entry(modify_window)
+        entry_auteur.grid(row=1, column=1)
 
-        self.livre_controller.update_livre(id_livre, titre, auteur, annee)
-        messagebox.showinfo("Succès", "Livre modifié avec succès.")
-        self.refresh_livre_list()
+        tk.Label(modify_window, text="Année:").grid(row=2, column=0)
+        entry_annee = tk.Entry(modify_window)
+        entry_annee.grid(row=2, column=1)
 
-    def supprimer_livre(self):
-        """Supprime un livre de la base de données par son ID."""
-        id_livre = self.entry_id.get()
-        if not id_livre:
-            messagebox.showerror("Erreur", "Veuillez saisir l'ID du livre à supprimer.")
-            return
-        try:
-            id_livre = int(id_livre)
-        except ValueError:
-            messagebox.showerror("Erreur", "L'ID doit être un nombre.")
-            return
-        self.livre_controller.delete_livre(id_livre)
-        messagebox.showinfo("Succès", "Livre supprimé avec succès.")
-        self.refresh_livre_list()
+        def save_changes():
+            """Enregistre les modifications apportées à un livre."""
+            new_titre = entry_titre.get()
+            new_auteur = entry_auteur.get()
+            new_annee = entry_annee.get()
+
+            if not new_titre or not new_auteur or not new_annee:
+                messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
+                return
+
+            try:
+                new_annee = int(new_annee)
+            except ValueError:
+                messagebox.showerror("Erreur", "L'année doit être un nombre.")
+                return
+
+            if not self.validate_input(new_titre, new_auteur, new_annee):
+                return
+
+            self.livre_controller.update_livre(livre_id, new_titre, new_auteur, new_annee)
+            messagebox.showinfo("Succès", "Livre modifié avec succès.")
+            modify_window.destroy()
+            self.refresh_livre_list()
+
+        tk.Button(modify_window, text="Enregistrer", command=save_changes).grid(row=3, column=0, columnspan=2)
 
     def rechercher_livre(self):
         """Recherche des livres dans la base de données."""
