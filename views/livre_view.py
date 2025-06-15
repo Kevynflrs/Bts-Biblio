@@ -107,29 +107,76 @@ class LivreView:
         self.refresh_livre_list()
 
     def modifier_livre(self):
-        """Modifie un livre existant dans la base de données."""
+        """Ouvre une fenêtre popup pour modifier un livre existant."""
         id_livre = self.entry_id.get()
-        titre = self.entry_titre.get()
-        auteur = self.entry_auteur.get()
-        annee = self.entry_annee.get()
-
-        if not id_livre or not titre or not auteur or not annee:
-            messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
+        if not id_livre:
+            messagebox.showerror("Erreur", "Veuillez saisir l'ID du livre à modifier.")
             return
 
         try:
             id_livre = int(id_livre)
-            annee = int(annee)
         except ValueError:
-            messagebox.showerror("Erreur", "L'ID et l'année doivent être des nombres.")
+            messagebox.showerror("Erreur", "L'ID doit être un nombre.")
             return
 
-        if not self.validate_input(titre, auteur, annee):
+        # Recherche du livre pour pré-remplir les champs
+        livres = self.livre_controller.search_livres("")
+        livre_cible = None
+        for livre in livres:
+            if livre[0] == id_livre:
+                livre_cible = livre
+                break
+
+        if not livre_cible:
+            messagebox.showerror("Erreur", f"Aucun livre trouvé avec l'ID {id_livre}.")
             return
 
-        self.livre_controller.update_livre(id_livre, titre, auteur, annee)
-        messagebox.showinfo("Succès", "Livre modifié avec succès.")
-        self.refresh_livre_list()
+        # Créer une popup
+        popup = tk.Toplevel(self.root)
+        popup.title("Modifier le livre")
+
+        # Champs pré-remplis
+        tk.Label(popup, text="Titre").grid(row=0, column=0)
+        entry_titre = tk.Entry(popup)
+        entry_titre.insert(0, livre_cible[1])
+        entry_titre.grid(row=0, column=1)
+
+        tk.Label(popup, text="Auteur").grid(row=1, column=0)
+        entry_auteur = tk.Entry(popup)
+        entry_auteur.insert(0, livre_cible[2])
+        entry_auteur.grid(row=1, column=1)
+
+        tk.Label(popup, text="Année").grid(row=2, column=0)
+        entry_annee = tk.Entry(popup)
+        entry_annee.insert(0, str(livre_cible[3]))
+        entry_annee.grid(row=2, column=1)
+
+        def confirmer_modification():
+            titre = entry_titre.get()
+            auteur = entry_auteur.get()
+            annee = entry_annee.get()
+
+            if not titre or not auteur or not annee:
+                messagebox.showerror("Erreur", "Tous les champs doivent être remplis.")
+                return
+
+            try:
+                annee = int(annee)
+            except ValueError:
+                messagebox.showerror("Erreur", "L'année doit être un nombre.")
+                return
+
+            if not self.validate_input(titre, auteur, annee):
+                return
+
+            self.livre_controller.update_livre(id_livre, titre, auteur, annee)
+            messagebox.showinfo("Succès", "Livre modifié avec succès.")
+            self.refresh_livre_list()
+            popup.destroy()
+
+        # Bouton de confirmation
+        tk.Button(popup, text="Enregistrer", command=confirmer_modification).grid(row=3, column=0, columnspan=2)
+
 
     def supprimer_livre(self):
         """Supprime un livre de la base de données par son ID."""
@@ -142,9 +189,12 @@ class LivreView:
         except ValueError:
             messagebox.showerror("Erreur", "L'ID doit être un nombre.")
             return
-        self.livre_controller.delete_livre(id_livre)
-        messagebox.showinfo("Succès", "Livre supprimé avec succès.")
-        self.refresh_livre_list()
+
+        confirmation = messagebox.askyesno("Confirmation", f"Supprimer le livre avec ID {id_livre} ?")
+        if confirmation:
+            self.livre_controller.delete_livre(id_livre)
+            messagebox.showinfo("Succès", "Livre supprimé avec succès.")
+            self.refresh_livre_list()
 
     def rechercher_livre(self):
         """Recherche des livres dans la base de données."""
