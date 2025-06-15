@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import ttk
-from database.database_manager import create_connection, create_tables
+import tkinter.ttk as ttk
+from views.auth_view import AuthView
 from views.livre_view import LivreView
 from views.adherent_view import AdherentView
 from views.emprunt_view import EmpruntView
+from database.database_manager import create_connection, create_tables
 
 def initialize_database(db_file):
     """Initialize the database and create tables if they don't exist."""
@@ -14,12 +15,22 @@ def initialize_database(db_file):
     else:
         print("Error! Cannot create the database connection.")
 
-class Application(ttk.Frame):
-    def __init__(self, parent, db_file):
+def on_login_success(username, role):
+    root = tk.Tk()
+    app = Application(root, "bibliotheque.db", username, role)
+    root.mainloop()
+
+class Application(tk.Frame):
+    def __init__(self, parent, db_file, username, role):
         super().__init__(parent)
 
         self.parent = parent
         self.db_file = db_file
+        self.username = username
+        self.role = role
+
+        self.parent.title(f"Application de Gestion de Bibliothèque - {username} ({role})")
+        self.parent.geometry("800x600")
 
         self.notebook = ttk.Notebook(self.parent)
         self.notebook.pack(pady=10, expand=True, fill='both')
@@ -39,15 +50,16 @@ class Application(ttk.Frame):
         self.notebook.add(emprunt_frame, text="Gestion des Emprunts")
         EmpruntView(emprunt_frame, self.db_file)
 
+        # Désactiver les onglets en fonction du rôle
+        if self.role != "admin":
+            self.notebook.tab(1, state="disabled")  # Désactiver l'onglet Adhérents
+            self.notebook.tab(2, state="disabled")  # Désactiver l'onglet Emprunts
+
 def main():
     root = tk.Tk()
-    root.title("Application de Gestion de Bibliothèque")
     db_file = "bibliotheque.db"
-
-    # Initialize the database
     initialize_database(db_file)
-
-    app = Application(root, db_file)
+    auth_view = AuthView(root, db_file, on_login_success)
     root.mainloop()
 
 if __name__ == "__main__":

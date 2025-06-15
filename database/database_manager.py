@@ -62,6 +62,16 @@ def create_tables(conn):
             FOREIGN KEY (id_adherent) REFERENCES Adherents (id)
         )
         ''')
+        
+        # Create Utilisateurs table
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Utilisateurs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+        ''')
 
         conn.commit()  # Valide les changements dans la base de données
     except Error as e:
@@ -126,6 +136,23 @@ def search_livres(conn, query):
     cursor.execute(sql, (f'%{query}%', f'%{query}%'))
     rows = cursor.fetchall()
     return rows
+
+def add_utilisateur(conn, utilisateur):
+    """ Add a new user to the Utilisateurs table """
+    sql = ''' INSERT INTO Utilisateurs(username, password, role)
+              VALUES(?,?,?) '''
+    cursor = conn.cursor()
+    cursor.execute(sql, utilisateur)
+    conn.commit()
+    return cursor.lastrowid
+
+def get_utilisateur(conn, username):
+    """ Get a user by username """
+    sql = ''' SELECT * FROM Utilisateurs WHERE username = ? '''
+    cursor = conn.cursor()
+    cursor.execute(sql, (username,))
+    return cursor.fetchone()
+
 
 def main():
     """
