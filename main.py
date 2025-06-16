@@ -4,7 +4,7 @@ from views.auth_view import AuthView
 from views.livre_view import LivreView
 from views.adherent_view import AdherentView
 from views.emprunt_view import EmpruntView
-from views.statistiques_view import StatistiquesView
+##from views.statistiques_view import StatistiquesView
 from database.database_manager import create_connection, create_tables
 
 def initialize_database(db_file):
@@ -52,10 +52,10 @@ class Application(tk.Frame):
         EmpruntView(emprunt_frame, self.db_file, self.role)
 
         # Onglet pour les statistiques (uniquement pour les administrateurs)
-        if self.role == "admin":
-            statistiques_frame = ttk.Frame(self.notebook)
-            self.notebook.add(statistiques_frame, text="Statistiques")
-            StatistiquesView(statistiques_frame, self.db_file)
+        ##if self.role == "admin":
+            ##statistiques_frame = ttk.Frame(self.notebook)
+            ##self.notebook.add(statistiques_frame, text="Statistiques")
+            ##StatistiquesView(statistiques_frame, self.db_file)
 
 def main():
     root = tk.Tk()
