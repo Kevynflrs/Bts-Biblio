@@ -7,6 +7,7 @@ Une application client lourd pour la gestion d'une bibliothèque, permettant d'e
 - [Fonctionnalités](#fonctionnalités)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
+- [Installation des dépendances](#Installation des Dépendances)
 - [Exécution](#exécution)
 - [Structure du Projet](#structure-du-projet)
 - [Documentation](#documentation)
