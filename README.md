@@ -7,7 +7,7 @@ Une application client lourd pour la gestion d'une bibliothèque, permettant d'e
 - [Fonctionnalités](#fonctionnalités)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
-- [Installation des dépendances](#Installation des Dépendances)
+- [Dépendances](#Dépendances)
 - [Exécution](#exécution)
 - [Structure du Projet](#structure-du-projet)
 - [Documentation](#documentation)
@@ -42,7 +42,7 @@ Une application client lourd pour la gestion d'une bibliothèque, permettant d'e
     source venv/bin/activate  # Sur Linux/Mac
     .\venv\Scripts\activate  # Sur Windows
 
-## Installation des Dépendances
+## Dépendances
 
 Avant de pouvoir exécuter l'application, vous devez installer les dépendances nécessaires. Vous pouvez le faire en utilisant `pip`, le gestionnaire de paquets de Python. Ouvrez un terminal ou une invite de commandes et exécutez les commandes suivantes :
 
