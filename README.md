@@ -44,6 +44,19 @@ Une application client lourd pour la gestion d'une bibliothèque, permettant d'e
     source venv/bin/activate  # Sur Linux/Mac
     .\venv\Scripts\activate  # Sur Windows
 
+## Installation des Dépendances
+
+Avant de pouvoir exécuter l'application, vous devez installer les dépendances nécessaires. Vous pouvez le faire en utilisant `pip`, le gestionnaire de paquets de Python. Ouvrez un terminal ou une invite de commandes et exécutez les commandes suivantes :
+
+    pip install pandas matplotlib pyinstaller
+
+Ces commandes installeront les bibliothèques nécessaires pour exécuter l'application, notamment :
+
+    Pandas : Utilisé pour la manipulation et l'analyse des données.
+    Matplotlib : Utilisé pour la visualisation des données et la création de graphiques.
+    PyInstaller : Utilisé pour créer des exécutables à partir de scripts Python.
+
+
 ## Installation
 
 Pour démarrer l'application, exécutez le fichier main.py :
