@@ -18,7 +18,7 @@ class Emprunt:
     def to_tuple(self):
         # Convertit les attributs de l'objet Emprunt en un tuple
         # Facilite l'insertion dans la base de données
-        return (self.id_livre, self.id_adherent, self.date_emprunt, self.date_retour)
+        return (self.id_livre, self.id_adherent, self.date_emprunt)
 
     def to_tuple_with_id(self):
         # Convertit tous les attributs de l'objet Emprunt, y compris l'id, en un tuple
